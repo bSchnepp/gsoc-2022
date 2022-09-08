@@ -1,0 +1,364 @@
+#
+#	$NetBSD: GENERIC,v 1.107 2022/04/02 11:16:07 skrll Exp $
+#
+#	GENERIC ARM (aarch32) kernel
+#
+
+include	"arch/evbarm/conf/std.generic"
+include	"arch/evbarm/conf/files.rpi"
+include	"arch/evbarm/conf/GENERIC.common"
+
+options 	CPU_CORTEX
+options 	SOC_BCM2836
+options 	MULTIPROCESSOR
+
+pseudo-device 	openfirm	# /dev/openfirm
+
+#options 	DIAGNOSTIC	# internal consistency checks
+#options 	DEBUG
+#options 	LOCKDEBUG
+#options 	UVMHIST		# kernhist for uvm/pmap subsystems
+#options 	PCI_CONFIG_DUMP	# verbosely dump PCI config space
+
+options 	MSGBUFSIZE=32768
+
+#options 	VERBOSE_INIT_ARM # verbose bootstrapping messages
+
+# EARLYCONS is required for early init messages from VERBOSE_INIT_ARM.
+
+#options 	EARLYCONS=am33xx, CONSADDR=0x44e09000
+
+# RaspberryPIs
+#options 	EARLYCONS=bcm2835, CONSADDR=0x20201000
+#options 	EARLYCONS=bcm2836, CONSADDR=0x3f201000
+#options 	EARLYCONS=bcm2837, CONSADDR=0x3f215040
+
+# Kernel Undefined Behavior Sanitizer (kUBSan). Use UBSAN_ALWAYS_FATAL
+# if you want panics instead of warnings.
+#options 	KUBSAN			# mandatory
+#options 	UBSAN_ALWAYS_FATAL	# optional
+
+# Kernel Address Sanitizer (kASan). The quarantine is optional and can
+# help KASAN find more use-after-frees. Use KASAN_PANIC if you want panics
+# instead of warnings.
+#makeoptions 	KASAN=1		# mandatory
+#options 	KASAN		# mandatory
+#options 	POOL_QUARANTINE	# optional
+#options 	KASAN_PANIC	# optional
+
+# These options enable verbose messages for several subsystems.
+# Warning, these may compile large string tables into the kernel!
+#options 	ACPIVERBOSE	# verbose ACPI configuration messages
+#options 	MIIVERBOSE	# verbose PHY autoconfig messages
+#options 	PCIVERBOSE	# verbose PCI device autoconfig messages
+#options 	PCMCIAVERBOSE	# verbose PCMCIA configuration messages
+#options 	SCSIVERBOSE	# human readable SCSI error messages
+#options 	USBVERBOSE	# verbose USB device autoconfig messages
+
+makeoptions 	DEBUG="-g"	# compile full symbol table
+makeoptions 	COPY_SYMTAB=1
+
+#
+# FDT files supported by this kernel - add to DTSSUBDIR and DTS as
+# appropriate
+#
+makeoptions	DTSARCH="arm"
+makeoptions	DTS="bcm2837-rpi-3-b-plus.dts"
+
+config		netbsd		root on ? type ?
+
+# EFI runtime support
+options 	EFI_RUNTIME
+#pseudo-device	efi		# /dev/efi
+
+# Device tree support
+armfdt0		at root
+simplebus*	at fdt? pass 0
+
+# CPUs
+cpus*		at fdt? pass 0
+cpu*		at fdt? pass 0
+
+# CPU frequency scaling
+cpufreqdt* 	at cpu?
+
+# Power State Coordination Interface (PSCI)
+psci* 		at fdt?
+
+# Clock and reset controllers
+fclock* 	at fdt? pass 1
+ffclock* 	at fdt? pass 1
+fregulator* 	at fdt? pass 5
+gregulator* 	at fdt? pass 4
+gpiokeys* 	at fdt?
+wskbd* 		at gpiokeys? console ? mux 1
+gpioleds* 	at fdt?
+
+
+# System Controller
+syscon*		at fdt? pass 1		# Generic System Controller
+
+# Timer
+a9ptmr* 	at fdt? pass 2		# ARM Cortex A5/A9 Private Timer
+arma9ptmr* 	at a9ptmr?
+a9tmr* 	at fdt? pass 2		# ARM Cortex A5/A9 Timer
+arma9tmr* 	at a9tmr?
+gtmr* 		at fdt? pass 1		# ARM Generic Timer
+armgtmr0 	at gtmr?
+
+# Watchdog
+a9wdt*  	at fdt? pass 2		# ARM Cortex A5/A9 Watchdog
+arma9wdt* 	at a9wdt?
+bcmpmwdog* 	at fdt?			# Broadcom BCM283x watchdog
+dwcwdt* 	at fdt?			# DesignWare watchdog
+
+# Interrupt controller
+gic* 		at fdt? pass 1		# ARM GIC
+armgic0 	at gic?
+bcmicu* 	at fdt? pass 1		# Broadcom BCM283x ICU
+
+# Level 2 Cache Controller
+l2cc* 		at fdt? pass 2		# ARM Cortex A9 L2 Cache Controller
+arml2cc* 	at l2cc?
+
+# Firmware devices
+bcmmbox* 	at fdt?	pass 1		# Broadcom VideoCore IV mailbox
+qemufwcfg* 	at fdt?			# QEMU Firmware Configuration device
+vcmbox* 	at bcmmbox?
+
+# DMA controller
+bcmdmac* 	at fdt?			# Broadcom BCM283x DMA controller
+
+# Performance monitors
+armpmu* 	at fdt?
+pseudo-device 	tprof
+
+# Clock and Reset controller
+bcmcprman* 	at fdt? pass 1		# Broadcom BCM283x Clock Manager
+bcmaux* 	at fdt? pass 1		# Broadcom BCM283x Aux Periph Clocks
+
+# GPIO controller
+bcmgpio* 	at fdt?	pass 1		# Broadcom BCM283x GPIO
+plgpio* 	at fdt?			# ARM PrimeCell GPIO
+gpio* 		at gpiobus?
+
+# IOMUX / MPIO / Pinmux
+pinctrl* 	at fdt? pass 2		# Generic pinctrl driver
+
+# Backlight
+pwmbacklight* 	at fdt?			# PWM Backlight controls
+
+# Fan
+pwmfan* 	at fdt?			# PWM Fan controls
+
+# PCIE
+pcihost* 	at fdt?			# Generic PCI host controller
+pci* 		at pcibus?
+ppb* 		at pci? dev ? function ?
+pci* 		at ppb?
+
+# Ethernet
+smsh* 		at fdt?			# SMSC LAN9118
+
+# PCI Ethernet
+re* 		at pci? dev ? function ?	# Realtek RTL8111GS
+
+# MII/PHY support
+atphy* 		at mii? phy ?		# Attansic/Atheros PHYs
+gentbi* 	at mii? phy ?		# Generic Ten-Bit 1000BASE-[CLS]X PHYs
+glxtphy* 	at mii? phy ?		# Level One LXT-1000 PHYs
+gphyter* 	at mii? phy ?		# NS83861 Gig-E PHY
+icsphy* 	at mii? phy ?		# Integrated Circuit Systems ICS189x
+igphy* 		at mii? phy ?		# Intel IGP01E1000
+ihphy* 		at mii? phy ?		# Intel 82577 PHYs
+ikphy* 		at mii? phy ?		# Intel 82563 PHYs
+inphy* 		at mii? phy ?		# Intel 82555 PHYs
+iophy* 		at mii? phy ?		# Intel 82553 PHYs
+lxtphy* 	at mii? phy ?		# Level One LXT-970 PHYs
+makphy* 	at mii? phy ?		# Marvell Semiconductor 88E1000 PHYs
+nsphy* 		at mii? phy ?		# NS83840 PHYs
+nsphyter* 	at mii? phy ?		# NS83843 PHYs
+pnaphy* 	at mii? phy ?		# generic HomePNA PHYs
+qsphy* 		at mii? phy ?		# Quality Semiconductor QS6612 PHYs
+rdcphy* 	at mii? phy ?		# RDC R6040 10/100 PHY
+rgephy* 	at mii? phy ?		# Realtek 8169S/8110S internal PHYs
+rlphy* 		at mii? phy ?		# Realtek 8139/8201L PHYs
+smscphy* 	at mii? phy ?		# SMSC LAN87xx PHYs
+sqphy* 		at mii? phy ?		# Seeq 80220/80221/80223 PHYs
+tlphy* 		at mii? phy ?		# ThunderLAN PHYs
+tqphy* 		at mii? phy ?		# TDK Semiconductor PHYs
+urlphy* 	at mii? phy ?		# Realtek RTL8150L internal PHYs
+ukphy* 		at mii? phy ?		# generic unknown PHYs
+
+# Mini-PCIe Wireless
+#options 	ATHHAL_AR5212,ATHHAL_RF2425	# AR5BHB63
+#ath* 		at pci? dev ? function ?	# Atheros IEEE 802.11
+#athn* 		at pci? dev ? function ?	# Atheros IEEE 802.11
+
+# UART
+com* 		at fdt?	pass 4		# UART
+plcom* 		at fdt?	pass 4		# ARM PL011 UART
+
+# I2C controllers
+options 	I2C_MAX_ADDR=0xfff
+bsciic* 	at fdt?	pass 2		# Broadcom BCM283x Serial Control
+iicmux* 	at fdt? pass 5		# I2C mux virtual controllers
+iic* 		at i2cbus?
+
+# I2C devices
+ac100ic* 	at iic?			# AC100 integrated audio codec and RTC
+as3722pmic* 	at iic?
+as3722reg* 	at as3722pmic?
+axp20x* 	at iic?			# AXP209 Power Management IC
+axp20xreg* 	at axp20x?
+axp22x* 	at iic?			# AXP221 Power Management IC
+axppmic* 	at iic?			# X-Powers AXP Power Management IC
+axpreg* 	at axppmic?
+dsrtc*		at iic?			# Dallas Semiconductor RTCs
+em3027rtc* 	at iic?
+max77620pmic* 	at iic?
+pcaiicmux*	at iic?			# PCA954x / PCA984x I2C switch / mux
+pcf8563rtc* 	at iic?			# PCF8563 RTC
+seeprom* 	at iic?			# AT24Cxx Serial EEPROM
+sy8106a* 	at iic?			# Silergy SY81061 regulator
+tcagpio* 	at iic?
+tdahdmi* 	at iic?			# NXP TDA19988 HDMI encoder
+
+# CAN bus
+options 	CAN			# Controller Area Network protocol
+pseudo-device 	canloop			# CAN loopback interface
+
+# SPI
+spi* 		at spibus?
+
+# SPI NOR-Flash
+spiflash* 	at spiflashbus?
+m25p* 		at spi? slave ?
+
+# Random number generators
+bcmrng* 	at fdt?			# Broadcom BCM283x RNG
+
+# RTC
+plrtc* 		at fdt?			# ARM PrimeCell RTC
+
+# BCM2835 VCHIQ, etc
+vchiq0 		at fdt?
+vcaudio0 	at vchiq0
+
+# Audio
+aaci* 		at fdt?			# ARM PrimeCell AACI
+ausoc* 		at fdt?			# Simple SoC audio card
+audio* 		at audiobus?
+spkr* 		at audio?
+
+# SDMMC
+bcmsdhost* 	at fdt?			# Broadcom BCM283x SD Host Interface
+dwcmmc* 	at fdt?			# DesignWare SDMMC
+mmcpwrseq* 	at fdt?			# Simple MMC power sequence provider
+plmmc* 		at fdt?			# ARM PrimeCell MCI
+sdhc* 		at fdt?			# SD Host Controller Interface
+sdmmc* 		at sdmmcbus?
+ld0 		at sdmmc0
+ld1 		at sdmmc1
+ld2 		at sdmmc2
+ld3 		at sdmmc3
+ld* 		at sdmmc?
+bwfm* 		at sdmmc?		# Broadcom BCM43xxx WiFi Interface
+
+# ATAPI devices
+# flags have the same meaning as for IDE drives.
+cd* 		at atapibus? drive ? flags 0x0000	# ATAPI CD-ROM drives
+sd* 		at atapibus? drive ? flags 0x0000	# ATAPI disk drives
+st* 		at atapibus? drive ? flags 0x0000	# ATAPI tape drives
+uk* 		at atapibus? drive ? flags 0x0000	# ATAPI unknown
+
+# NVMe
+nvme* 		at pci? dev ? function ?
+ld* 		at nvme? nsid ?
+
+# SPI controllers
+bcmspi* 	at fdt?			# Broadcom BCM283x SPI
+spi* 		at spibus?
+
+# Display
+genfb* 		at fdt?			# Simple Framebuffer
+wsdisplay* 	at wsemuldisplaydev?
+connector* 	at fdt? pass 4
+panel* 		at fdt? pass 4
+vcfourcrtc* 	at fdt? pass 7 		# Broadcom VideoCore 4 Pixel Valve
+vcfourdsi* 	at fdt? pass 7 		# Broadcom VideoCore 4 DSI
+vcfourdpi* 	at fdt? pass 7 		# Broadcom VideoCore 4 DPI
+vcfourhdmi* 	at fdt? pass 8		# Broadcom VideoCore 4 HDMI
+
+options 	VCONS_DRAW_INTR
+options 	WSEMUL_VT100
+options 	WSDISPLAY_CUSTOM_OUTPUT
+options 	WS_DEFAULT_FG=WSCOL_WHITE
+options 	WS_DEFAULT_BG=WSCOL_BLACK
+options 	WS_KERNEL_FG=WSCOL_GREEN
+options 	WS_KERNEL_BG=WSCOL_BLACK
+options 	WSDISPLAY_COMPAT_PCVT
+options 	WSDISPLAY_COMPAT_SYSCONS
+options 	WSDISPLAY_COMPAT_USL
+options 	WSDISPLAY_COMPAT_RAWKBD
+options 	WSDISPLAY_DEFAULTSCREENS=4
+options 	WSDISPLAY_MULTICONS
+options 	WSDISPLAY_SCROLLSUPPORT
+pseudo-device	wsmux
+pseudo-device	wsfont
+options 	FONT_BOLD8x16
+options 	FONT_BOLD16x32
+
+# GPU
+vcfour* 	at fdt? pass 5		# Broadcom VideoCore 4 GPU
+vcfourhvs* 	at fdt? pass 6 		# Broadcom VideoCore 4 GPU (Scaling)
+vcfourv3d*	at fdt? pass 6		# Broadcom VideoCore 4 GPU (3D)
+vcfourtxp* 	at fdt? pass 6		# Broadcom VideoCore 4 GPU (TXP)
+vcfourvec* 	at fdt? pass 6		# Broadcom VideoCore 4 GPU (Vector)
+
+# PS/2 keyboard and mouse support
+plkmi* 		at fdt?
+pckbd* 		at pckbport?
+wskbd* 		at pckbd? console ?
+pms* 		at pckbport?
+wsmouse* 	at pms? mux 0
+
+# USB
+usbnopphy* 	at fdt? pass 9		# Generic USB PHY
+
+dwctwo* 	at fdt?			# Designware USB DRD
+ehci* 		at fdt?			# EHCI
+ohci* 		at fdt?			# OHCI
+xhci* 		at fdt?			# XHCI
+usb* 		at usbus?
+
+# SCSI
+scsibus* at scsi?
+sd* 		at scsibus? target ? lun ?	# SCSI disks
+st* 		at scsibus? target ? lun ?	# SCSI tapes
+cd* 		at scsibus? target ? lun ?	# SCSI CD-ROMs
+ch* 		at scsibus? target ? lun ?	# SCSI changer devices
+ss* 		at scsibus? target ? lun ?	# SCSI scanners
+ses* 		at scsibus? target ? lun ?	# SCSI SES/SAF-TE devices
+uk* 		at scsibus? target ? lun ?	# unknown SCSI
+
+# SPI NOR flash support
+m25p* 		at spi?
+spiflash* 	at spiflashbus?
+
+include "dev/usb/usbdevices.config"
+midi* 		at midibus?
+pseudo-device	sequencer			# MIDI sequencer
+
+# Bluetooth USB Controllers
+ubt* at uhub? port ?
+
+# Bluetooth Device Hub
+bthub* at bcsp?
+bthub* at btuart?
+bthub* at bthfive?
+bthub* at ubt?
+
+include "dev/bluetooth/bluetoothdevices.config"
+
+cinclude "arch/evbarm/conf/GENERIC.local"
