@@ -1,13 +1,14 @@
 # gsoc-2022
 NetBSD GSoC Final Submission
-___
 
 ## Final Product
 
-## [VC4 Changes for NetBSD src](https://github.com/bSchnepp/src/tree/vc4)
-## [VC4 Changes for NetBSD xsrc](https://github.com/bSchnepp/xsrc/tree/vc4)
+The main result of this project was to enable the vc4 driver under NetBSD, and
+to make as much progress as possible to enabling graphics acceleration using the driver.
 
-The main result of this project was to enable the vc4 driver under NetBSD.
+### [VC4 Changes for NetBSD src](https://github.com/bSchnepp/src/tree/vc4)
+### [VC4 Changes for NetBSD xsrc](https://github.com/bSchnepp/xsrc/tree/vc4)
+
 ___
 
 ## Building
@@ -30,6 +31,7 @@ replace `netbsd-GENERIC.img` with `netbsd.img` to use the newly built kernel.
 ## Other files
 [A sample RPI_CONFIG](RPI_CONFIG)
 For convenience, a replacement for `sys/arch/evbarm/conf/files.rpi` [is also available here.](files.rpi)
+
 ___
  
 ## Functional components
