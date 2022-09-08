@@ -13,7 +13,10 @@ ___
 
 ## Building
 Both the modified src and xsrc repositories must be cloned, with their locations
-known. The command used to build the kernel, appropriately, was
+known. 
+Per the instructions below, some additional files supplied here will be necessary: RPI_CONFIG for the kernel configuration, files.vc4 to describe the components for the driver, and a modified files.rpi, which binds the vc4 driver into the Raspberry Pi configuration files.
+
+The command used to build the kernel, appropriately, was
 ```sh
 ./build.sh -U -u -O <OBJDIR> -j`nproc` -m evbarm -a earmv7hf -X <XSRC LOCATION> -x tools
 ./build.sh -U -u -O <OBJDIR> -j`nproc` -m evbarm -a earmv7hf -X <XSRC LOCATION> -x kernel=<RPI CONFIG LOCATION>
@@ -28,7 +31,7 @@ can be used as the base image for the SD card. The release image under `released
 By default, this will be a generic build of NetBSD with the appropriate DeviceTree files, but by copying `<<OBJDIR>/sys/arch/evbarm/compile/RPI_CONFIG/netbsd.img` into the root directory of the SD card's FAT partition, and changing config.txt to
 replace `netbsd-GENERIC.img` with `netbsd.img` to use the newly built kernel.
 
-## Other files
+## Required files
 [A sample RPI_CONFIG](RPI_CONFIG) <br/>
 [A copy of files.vc4, to be placed in src/sys/external/gpl2/drm2/vc4/files.vc4 needed is also here](files.vc4) <br/>
 For convenience, a replacement for `sys/arch/evbarm/conf/files.rpi` [is also available here.](files.rpi) <br/>
