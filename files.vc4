@@ -1,0 +1,97 @@
+#	$NetBSD: $
+
+version	20180827
+
+device	vcfour: drmkms, drmsched
+attach	vcfour at fdt
+file	external/gpl2/drm2/dist/drm/vc4/vc4_drv.c	vcfour
+
+device	vcfourdsi: drmkms, drmsched, vcfour
+attach	vcfourdsi at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_dsi.c	vcfourdsi
+
+device	vcfourdpi: drmkms, drmsched, vcfour
+attach	vcfourdpi at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_dpi.c	vcfourdpi
+
+device	vcfourhvs: drmkms, drmsched, vcfour
+attach	vcfourhvs at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_hvs.c	vcfourhvs
+
+device	vcfourtxp: drmkms, drmsched, vcfour
+attach	vcfourtxp at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_txp.c	vcfourtxp
+
+device	vcfourvec: drmkms, drmsched, vcfour
+attach	vcfourvec at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_vec.c	vcfourvec
+
+device	vcfourv3d: drmkms, drmsched, vcfour
+attach	vcfourv3d at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_v3d.c	vcfourv3d
+
+device	vcfourcrtc: drmkms, drmsched, vcfour
+attach	vcfourcrtc at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_crtc.c	vcfourcrtc
+
+device	vcfourhdmi: drmkms, drmsched, vcfour
+attach	vcfourhdmi at fdt
+file 	external/gpl2/drm2/dist/drm/vc4/vc4_hdmi.c	vcfourhdmi
+
+makeoptions	vcfour	CPPFLAGS+="-I$S/external/gpl2/drm2/dist/drm/vc4"
+makeoptions 	vcfour	CPPFLAGS+="-I$S/external/gpl2/drm2/dist/drm/vc4"
+makeoptions 	vcfour	CPPFLAGS+="-I$S/external/gpl2/drm2/dist/include"
+
+makeoptions	vcfour		"CWARNFLAGS.vcfour"+="-Wno-missing-field-initializers"
+makeoptions	vcfour		"CWARNFLAGS.vcfour"+="-Wno-shadow"
+makeoptions	vcfour		"CWARNFLAGS.vcfour"+="-Wno-pointer-arith"
+makeoptions	vcfour		"CWARNFLAGS.vcfour"+="-Wno-discarded-qualifiers"
+makeoptions	vcfour		"CWARNFLAGS.vcfour"+="-Wno-pointer-arith"
+makeoptions	vcfour		"CWARNFLAGS.vcfour"+="-Wno-cast-qual"
+
+makeoptions	vcfourhdmi	"CWARNFLAGS.vcfourhdmi"+="-Wno-missing-field-initializers"
+makeoptions	vcfourhdmi	"CWARNFLAGS.vcfourhdmi"+="-Wno-shadow"
+makeoptions	vcfourhdmi	"CWARNFLAGS.vcfourhdmi"+="-Wno-pointer-arith"
+makeoptions	vcfourhdmi	"CWARNFLAGS.vcfourhdmi"+="-Wno-discarded-qualifiers"
+makeoptions	vcfourhdmi	"CWARNFLAGS.vcfourhdmi"+="-Wno-pointer-arith"
+
+makeoptions	vcfourdsi	"CWARNFLAGS.vcfourdsi"+="-Wno-missing-field-initializers"
+makeoptions	vcfourdsi	"CWARNFLAGS.vcfourdsi"+="-Wno-shadow"
+makeoptions	vcfourdsi	"CWARNFLAGS.vcfourdsi"+="-Wno-pointer-arith"
+makeoptions	vcfourdsi	"CWARNFLAGS.vcfourdsi"+="-Wno-discarded-qualifiers"
+
+makeoptions	vcfourdpi	"CWARNFLAGS.vcfourdpi"+="-Wno-missing-field-initializers"
+makeoptions	vcfourdpi	"CWARNFLAGS.vcfourdpi"+="-Wno-shadow"
+
+makeoptions	vcfourcrtc	"CWARNFLAGS.vcfourcrtc"+="-Wno-missing-field-initializers"
+makeoptions	vcfourcrtc	"CWARNFLAGS.vcfourcrtc"+="-Wno-shadow"
+makeoptions	vcfourcrtc	"CWARNFLAGS.vcfourcrtc"+="-Wno-pointer-arith"
+makeoptions	vcfourcrtc	"CWARNFLAGS.vcfourcrtc"+="-Wno-discarded-qualifiers"
+
+makeoptions	vcfourhvs	"CWARNFLAGS.vcfourhvs"+="-Wno-missing-field-initializers"
+makeoptions	vcfourhvs	"CWARNFLAGS.vcfourhvs"+="-Wno-shadow"
+
+makeoptions	vcfourvec	"CWARNFLAGS.vcfourvec"+="-Wno-missing-field-initializers"
+makeoptions	vcfourvec	"CWARNFLAGS.vcfourvec"+="-Wno-shadow"
+
+makeoptions	vcfourtxp	"CWARNFLAGS.vcfourtxp"+="-Wno-missing-field-initializers"
+makeoptions	vcfourtxp	"CWARNFLAGS.vcfourtxp"+="-Wno-shadow"
+
+makeoptions	vcfourv3d	"CWARNFLAGS.vcfourv3d"+="-Wno-missing-field-initializers"
+makeoptions	vcfourv3d	"CWARNFLAGS.vcfourv3d"+="-Wno-shadow"
+
+# Local additions.
+file	external/gpl2/drm2/dist/drm/vc4/vc4_trace_points.c	vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_perfmon.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_fence.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_irq.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_kms.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_validate.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_render_cl.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_validate_shaders.c	vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_gem.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_bo.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_plane.c		vcfour
+file	external/gpl2/drm2/dist/drm/vc4/vc4_debugfs.c		vcfour
+file	external/gpl2/drm2/vc4/vc4_drm_writeback.c		vcfour
+

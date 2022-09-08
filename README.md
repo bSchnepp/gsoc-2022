@@ -29,8 +29,9 @@ By default, this will be a generic build of NetBSD with the appropriate DeviceTr
 replace `netbsd-GENERIC.img` with `netbsd.img` to use the newly built kernel.
 
 ## Other files
-[A sample RPI_CONFIG](RPI_CONFIG)
-For convenience, a replacement for `sys/arch/evbarm/conf/files.rpi` [is also available here.](files.rpi)
+[A sample RPI_CONFIG](RPI_CONFIG) <br/>
+[A copy of files.vc4, to be placed in src/sys/external/gpl2/drm2/vc4/files.vc4 needed is also here](files.vc4) <br/>
+For convenience, a replacement for `sys/arch/evbarm/conf/files.rpi` [is also available here.](files.rpi) <br/>
 
 ___
  
