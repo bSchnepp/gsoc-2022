@@ -9,6 +9,29 @@ to make as much progress as possible to enabling graphics acceleration using the
 ### [VC4 Changes for NetBSD src](https://github.com/bSchnepp/src/tree/vc4)
 ### [VC4 Changes for NetBSD xsrc](https://github.com/bSchnepp/xsrc/tree/vc4)
 
+The main changes in the xsrc repository were to include necessary header files for Broadcom's VideoCore 4 GPU, as well as incorporating a patch to allow for additional platform support.
+For the main src repository, most of the changes are present under `sys/external/gpl2/drm2/dist/drm/vc4` with some others in locations such as `sys/external/gpl2/drm2/vc4`, `sys/external/bsd/drm2` as well as some new DeviceTree files under `sys/arch/arm/dts/`.
+
+## Work Done
+___
+ 
+## Timeline
+For the first week, the main changes were to attempt to build each part of the vc4 driver as-is within the kernel, including the creation of some wrapper code which was missing. Most of these changes were for correcting spinlocks and other simple code.
+An initial split was also done for each component of the vc4 driver, so that it can be loaded more naturally. <br/> <br/>
+
+For the second week, remaining areas where physical addresses were used for Linux structures were replaced with the appropriate NetBSD equivalents. 
+
+## Functional components
+All of the major components are initialized, although the DSI driver typically will not finish it's setup. The main component of the vc4 driver, along with the TXP, VEC, V3D, HVS, DPI, CRTC, and HDMI drivers all load correctly on startup. However, the DSI driver was not tested.
+Appropriate wrapping for memory accesses, address space mapping, clock setup and utilization, and dependent I2C devices should all be prepared correctly, as well as utilizing existing code for power domain utilization.
+
+___
+ 
+## Remaining components
+Some issues still appear when attempting to initialize the X server. `startx` will typically crash nearly immediately. The main cause of crashes appears to be from `drm_gem_object_put_unlocked`, which seems to be related to framebuffer setup, as it is called from `drm_gem_fb_destroy` This may be related to the CRTC or HVS components.
+
+For future work, it would be desirable to correct these issues and allow for drawing to the display, as well as wrapping new parts of the driver into individual modules, such that it could be loaded dynamically rather than being directly injected into the kernel.
+
 ___
 
 ## Building
@@ -37,16 +60,3 @@ replace `netbsd-GENERIC.img` with `netbsd.img` to use the newly built kernel.
 For convenience, a replacement for `sys/arch/evbarm/conf/files.rpi` [is also available here.](files.rpi) <br/>
 
 ___
- 
-## Functional components
-All of the major components are initialized, although the DSI driver typically will not finish it's setup. The main component of the vc4 driver, along with the TXP, VEC, V3D, HVS, DPI, CRTC, and HDMI drivers all load correctly on startup. However, the DSI driver was not tested.
-Appropriate wrapping for memory accesses, address space mapping, clock setup and utilization, and dependent I2C devices should all be prepared correctly, as well as utilizing existing code for power domain utilization.
-
-___
- 
-## Remaining components
-Some issues still appear when attempting to initialize the X server. `startx` will typically crash nearly immediately. The main cause of crashes appears to be from `drm_gem_object_put_unlocked`, which seems to be related to framebuffer setup, as it is called from `drm_gem_fb_destroy` This may be related to the CRTC or HVS components.
-
-For future work, it would be desirable to correct these issues and allow for drawing to the display, as well as wrapping new parts of the driver into individual modules, such that it could be loaded dynamically rather than being directly injected into the kernel.
-
-
