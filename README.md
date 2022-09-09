@@ -5,6 +5,8 @@ NetBSD GSoC Final Submission
 
 The main result of this project was to enable the vc4 driver under NetBSD, and
 to make as much progress as possible to enabling graphics acceleration using the driver.
+At a high level, this was achieved by splitting the main portions of the vc4 driver into separate sub-components based on how they appear in the DeviceTree bindings, 
+and to adapt memory-related code to fit the model presented by NetBSD while avoiding deep changes to the original code where they were unnecessary.
 
 ### [VC4 Changes for NetBSD src](https://github.com/bSchnepp/src/tree/vc4)
 ### [VC4 Changes for NetBSD xsrc](https://github.com/bSchnepp/xsrc/tree/vc4)
@@ -12,10 +14,11 @@ to make as much progress as possible to enabling graphics acceleration using the
 The main changes in the xsrc repository were to include necessary header files for Broadcom's VideoCore 4 GPU, as well as incorporating a patch to allow for additional platform support.
 For the main src repository, most of the changes are present under `sys/external/gpl2/drm2/dist/drm/vc4` with some others in locations such as `sys/external/gpl2/drm2/vc4`, `sys/external/bsd/drm2` as well as some new DeviceTree files under `sys/arch/arm/dts/`.
 
-## Work Done
 ___
+
+## Work Done
  
-## Timeline
+### Timeline
 For the first week, the main changes were to attempt to build each part of the vc4 driver as-is within the kernel, including the creation of some wrapper code which was missing. Most of these changes were for correcting spinlocks and other simple code.
 An initial split was also done for each component of the vc4 driver, so that it can be loaded more naturally. <br/> <br/>
 
@@ -70,7 +73,6 @@ All of the major components are initialized, although the DSI driver typically w
 However, the DPI driver was not tested. Appropriate wrapping for memory accesses, address space mapping, clock setup and utilization, and dependent I2C devices should all be prepared correctly, 
 as well as utilizing existing code for power domain utilization.
 
-___
  
 ## Remaining components
 Some issues still appear when attempting to initialize the X server. `startx` will typically crash nearly immediately. The main cause of crashes appears to be from `drm_gem_object_put_unlocked`, which seems to be related to framebuffer setup, as it is called from `drm_gem_fb_destroy` This may be related to the CRTC or HVS components. Some other issues seem to also occasionally appear rarely, but seem to be related to the same underlying cause.
