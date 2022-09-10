@@ -8,7 +8,7 @@ to make as much progress as possible with enabling graphics acceleration under t
 At a high level, this was achieved by splitting the main portions of the vc4 driver into separate sub-components based on how they appear in the DeviceTree bindings, 
 and to adapt memory-related code to fit the model presented by NetBSD while avoiding deep changes to the original code where they were unnecessary. <br/>
 
-This approach simplified the loading process, and fits with the methodology expected by NetBSD.
+This driver splitting approach simplified the loading process, and fits with the methodology expected by NetBSD.
 
 ### [VC4 Changes for NetBSD src](https://github.com/bSchnepp/src/tree/vc4)
 ### [VC4 Changes for NetBSD xsrc](https://github.com/bSchnepp/xsrc/tree/vc4)
